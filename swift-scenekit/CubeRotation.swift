@@ -17,14 +17,14 @@ class CubeRotation: ObservableObject {
     
     @Published var useSpline = true {
         didSet {
-            CVDisplayLinkStop(displayLink)
+            displayLink.invalidate()
             
             vertexRotationIndex = 1
             vertexRotationTime = 0
             cubeVertices = cubeVertexOrigins
             scene = setupSceneKit()
             
-            CVDisplayLinkStart(displayLink)
+            displayLink.add(to: RunLoop.current, forMode: .default)
         }
     }
 
@@ -71,30 +71,21 @@ class CubeRotation: ObservableObject {
     var previousCube: SCNNode?
     var previousVertexMarker: SCNNode?
 
-    var displayLink: CVDisplayLink!
+    var displayLink: CADisplayLink!
 
     init() {
         scene = setupSceneKit()
 
-        CVDisplayLinkCreateWithCGDisplay(CGMainDisplayID(), &displayLink)
+        self.displayLink = CADisplayLink(target: self, selector: #selector(displayLinkTick))
         
-        let displayCallback: CVDisplayLinkOutputCallback = { _, _, _, _, _, displayLinkContext in
-            
-            if let displayLinkContext = displayLinkContext {
-                DispatchQueue.main.async {
-                    let cubeRotation = Unmanaged<CubeRotation>.fromOpaque(displayLinkContext).takeUnretainedValue()
-                    cubeRotation.vertexRotationStep()
-                }
-            }
-            
-            return kCVReturnSuccess
+        displayLink.add(to: RunLoop.current, forMode: .default)
+    }
+    
+    @objc private func displayLinkTick() {
+        DispatchQueue.main.async {
+            let cubeRotation = self
+            cubeRotation.vertexRotationStep()
         }
-        
-        CVDisplayLinkSetOutputCallback(displayLink,
-                                       displayCallback,
-                                       Unmanaged.passUnretained(self).toOpaque())
-        
-        CVDisplayLinkStart(displayLink)
     }
     
     public func vertexRotationStep() {

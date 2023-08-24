@@ -13,7 +13,7 @@ extension CubeRotation {
     func setupSceneKit() -> SCNScene {
         let scene = SCNScene()
   
-        scene.background.contents = NSColor(red: 41 / 255,
+        scene.background.contents = UIColor(red: 41 / 255,
                                             green: 42 / 255,
                                             blue: 48 / 255,
                                             alpha: 1)
@@ -44,7 +44,7 @@ extension CubeRotation {
         
         let ambient = SCNLight()
         ambient.type = .ambient
-        ambient.color = NSColor(white: 0.5, alpha: 1)
+        ambient.color = UIColor(white: 0.5, alpha: 1)
         let ambientNode = SCNNode()
         ambientNode.light = ambient
         
@@ -58,14 +58,14 @@ extension CubeRotation {
     func addLineBetweenVertices(vertexA: simd_double3,
                                 vertexB: simd_double3,
                                 inScene scene: SCNScene,
-                                color: NSColor = .yellow) {
+                                color: UIColor = .yellow) {
         
-        let geometrySource = SCNGeometrySource(vertices: [SCNVector3(x: vertexA.x,
-                                                                     y: vertexA.y,
-                                                                     z: vertexA.z),
-                                                          SCNVector3(x: vertexB.x,
-                                                                     y: vertexB.y,
-                                                                     z: vertexB.z)])
+        let geometrySource = SCNGeometrySource(vertices: [SCNVector3(x: Float(vertexA.x),
+                                                                     y: Float(vertexA.y),
+                                                                     z: Float(vertexA.z)),
+                                                          SCNVector3(x: Float(vertexB.x),
+                                                                     y: Float(vertexB.y),
+                                                                     z: Float(vertexB.z))])
         let indices: [Int8] = [0, 1]
         let indexData = Data(bytes: indices, count: 2)
         let element = SCNGeometryElement(data: indexData,
@@ -92,12 +92,12 @@ extension CubeRotation {
         let vector2 = vertices[0] - vertices[1]
         let normal = simd_normalize(simd_cross(vector1, vector2))
         
-        let normalSource = SCNGeometrySource(normals: [SCNVector3(x: normal.x, y: normal.y, z: normal.z),
-                                                       SCNVector3(x: normal.x, y: normal.y, z: normal.z),
-                                                       SCNVector3(x: normal.x, y: normal.y, z: normal.z)])
+        let normalSource = SCNGeometrySource(normals: [SCNVector3(x: Float(normal.x), y: Float(normal.y), z: Float(normal.z)),
+                                                       SCNVector3(x: Float(normal.x), y: Float(normal.y), z: Float(normal.z)),
+                                                       SCNVector3(x: Float(normal.x), y: Float(normal.y), z: Float(normal.z))])
         
         let sceneKitVertices = vertices.map {
-            return SCNVector3(x: $0.x, y: $0.y, z: $0.z)
+            return SCNVector3(x: Float($0.x), y: Float($0.y), z: Float($0.z))
         }
         let geometrySource = SCNGeometrySource(vertices: sceneKitVertices)
         
@@ -112,7 +112,7 @@ extension CubeRotation {
                                    elements: [element])
         
         geometry.firstMaterial?.isDoubleSided = true
-        geometry.firstMaterial?.diffuse.contents = NSColor.orange
+        geometry.firstMaterial?.diffuse.contents = UIColor.orange
         
         let node = SCNNode(geometry: geometry)
         
@@ -125,7 +125,7 @@ extension CubeRotation {
         assert(vertices.count == 8, "vertices count must be 3")
         
         let sceneKitVertices = vertices.map {
-            return SCNVector3(x: $0.x, y: $0.y, z: $0.z)
+            return SCNVector3(x: Float($0.x), y: Float($0.y), z: Float($0.z))
         }
         let geometrySource = SCNGeometrySource(vertices: sceneKitVertices)
         
@@ -159,7 +159,7 @@ extension CubeRotation {
                                    elements: [element])
         
         geometry.firstMaterial?.isDoubleSided = true
-        geometry.firstMaterial?.diffuse.contents = NSColor.systemMint
+        geometry.firstMaterial?.diffuse.contents = UIColor.systemMint
         geometry.firstMaterial?.metalness.contents = 0.2
         geometry.firstMaterial?.lightingModel = .physicallyBased
         
@@ -173,7 +173,7 @@ extension CubeRotation {
     @discardableResult
     func addSphereAt(position: simd_double3,
                      radius: CGFloat = 0.1,
-                     color: NSColor,
+                     color: UIColor,
                      scene: SCNScene) -> SCNNode {
         let sphere = SCNSphere(radius: radius)
         sphere.firstMaterial?.diffuse.contents = color
